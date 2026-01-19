@@ -111,12 +111,21 @@ export const handler: Handler = async (
   console.log(`[HIDEOUT REPORT] ${geoInfo}`);
   console.log(`[HIDEOUT REPORT] Zone: ${zone}, Guild: ${guild}, Server: ${server}`);
 
+  // Get GitHub configuration from environment variables
+  const githubOwner = process.env.GITHUB_OWNER || 'psykzz';
+  const githubRepo = process.env.GITHUB_REPO || 'avalon-hideout-mapper';
+  const includeGeoInIssue = process.env.INCLUDE_GEO_IN_ISSUE === 'true';
+
   // Initialize Octokit
   const octokit = new Octokit({
     auth: githubToken,
   });
 
   // Create the issue body
+  const geoInfoLine = includeGeoInIssue 
+    ? `\n---\n\n_This report was submitted via the automated submission endpoint._\n_Requester info: ${geoInfo}_`
+    : '\n---\n\n_This report was submitted via the automated submission endpoint._';
+
   const issueBody = `## Hideout Information
 
 **Zone Name:**
@@ -139,12 +148,7 @@ ${additional_notes || 'No additional notes provided'}
 **Verification:**
 - [ ] I have verified the zone name is correct
 - [ ] I have verified the guild name is spelled correctly
-- [ ] I have selected the correct server
-
----
-
-_This report was submitted via the automated submission endpoint._
-_Requester info: ${geoInfo}_
+- [ ] I have selected the correct server${geoInfoLine}
 `;
 
   const issueTitle = `[HIDEOUT] ${guild} in ${zone}`;
@@ -152,8 +156,8 @@ _Requester info: ${geoInfo}_
   try {
     // Create the GitHub issue
     const response = await octokit.rest.issues.create({
-      owner: 'psykzz',
-      repo: 'avalon-hideout-mapper',
+      owner: githubOwner,
+      repo: githubRepo,
       title: issueTitle,
       body: issueBody,
       labels: ['hideout-report'],

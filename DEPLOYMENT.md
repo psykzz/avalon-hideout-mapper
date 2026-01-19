@@ -42,9 +42,14 @@ vercel
 This application includes serverless functions for automated hideout report submission. To enable this functionality:
 
 1. Go to your Netlify site settings → Environment variables
-2. Add the following environment variable:
-   - **Key**: `GITHUB_TOKEN`
+2. Add the following environment variables:
+   - **Key**: `GITHUB_TOKEN` (required)
    - **Value**: Your GitHub personal access token with `repo` scope
+   
+Optional environment variables:
+   - `GITHUB_OWNER`: Repository owner (defaults to `psykzz`)
+   - `GITHUB_REPO`: Repository name (defaults to `avalon-hideout-mapper`)
+   - `INCLUDE_GEO_IN_ISSUE`: Set to `true` to include requester geo info in issue body (defaults to `false`)
    
 To create a GitHub token:
 1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
@@ -55,6 +60,8 @@ To create a GitHub token:
 6. Add it to Netlify environment variables
 
 The function will be available at: `/.netlify/functions/create-hideout-report` or `/api/create-hideout-report`
+
+**Privacy Note**: By default, requester geo information is only logged server-side and not included in public issues. Enable `INCLUDE_GEO_IN_ISSUE` only if you have appropriate privacy policies in place.
 
 See `netlify/functions/README.md` for detailed API documentation.
 

@@ -18,7 +18,10 @@ Or via the redirect:
 
 This function requires the following environment variable to be set in your Netlify site settings:
 
-- `GITHUB_TOKEN`: A GitHub personal access token with `repo` scope to create issues in the repository.
+- `GITHUB_TOKEN` (required): A GitHub personal access token with `repo` scope to create issues in the repository.
+- `GITHUB_OWNER` (optional): GitHub repository owner. Defaults to `psykzz`.
+- `GITHUB_REPO` (optional): GitHub repository name. Defaults to `avalon-hideout-mapper`.
+- `INCLUDE_GEO_IN_ISSUE` (optional): Set to `true` to include requester geo info in the issue body. Defaults to `false` for privacy. Geo info is always logged server-side regardless of this setting.
 
 To create a token:
 1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
@@ -80,6 +83,8 @@ The function logs the following information for abuse detection:
 - Requester IP address (from Netlify headers)
 - Geographic location (country, city, region)
 - Zone, guild, and server from the request
+
+**Important:** All geo information is logged server-side in Netlify function logs for abuse detection. By default, this information is NOT included in the public GitHub issue to protect user privacy. To include geo information in issues, set the `INCLUDE_GEO_IN_ISSUE` environment variable to `true`.
 
 Example log output:
 ```
@@ -154,15 +159,18 @@ curl -X POST http://localhost:8888/api/create-hideout-report \
 ### Security Considerations
 
 1. **Rate Limiting**: Consider implementing rate limiting on the Netlify level to prevent abuse
-2. **IP Logging**: The function logs IP addresses and geographic information to help identify potential abusers
-3. **Token Security**: Never commit the `GITHUB_TOKEN` to the repository. Always use environment variables.
-4. **Validation**: The function validates all input fields before creating the GitHub issue
+2. **IP Logging**: The function logs IP addresses and geographic information server-side to help identify potential abusers. This data is stored in Netlify function logs according to Netlify's data retention policies.
+3. **Privacy**: By default, user geo information is NOT included in public GitHub issues. Enable `INCLUDE_GEO_IN_ISSUE` only if you have a privacy policy that covers this data collection.
+4. **Token Security**: Never commit the `GITHUB_TOKEN` to the repository. Always use environment variables.
+5. **Validation**: The function validates all input fields before creating the GitHub issue
 
 ### Abuse Prevention
 
-The function includes the requester's IP and geographic information in the issue body, making it easier to:
-- Identify patterns of abuse
-- Block specific IP addresses or regions if needed
-- Track the source of spam reports
+The function includes abuse prevention mechanisms:
+- Server-side logging of IP addresses and geographic information in Netlify function logs
+- Optional inclusion of requester info in GitHub issues for public accountability
+- Track the source of spam reports through Netlify logs
+- Netlify provides built-in DDoS protection
+- Configure additional security rules in your Netlify site settings
 
-Netlify also provides built-in DDoS protection and you can configure additional security rules in your Netlify site settings.
+**Data Retention**: IP addresses and geo information are stored in Netlify function logs according to your Netlify plan's log retention period. Review Netlify's data retention policies and ensure compliance with applicable privacy regulations (GDPR, CCPA, etc.).
