@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import ServerSelector from '@/components/ServerSelector';
 import ZoneSearch from '@/components/ZoneSearch';
 import HideoutList from '@/components/HideoutList';
+import ReportHideoutModal from '@/components/ReportHideoutModal';
 import { getAvalonZoneNames } from '@/lib/zones';
 import { getHideoutsByZone } from '@/lib/hideouts';
 import { Server } from '@/lib/types';
@@ -11,6 +12,7 @@ import { Server } from '@/lib/types';
 export default function Home() {
   const [selectedServer, setSelectedServer] = useState<Server>('America');
   const [selectedZone, setSelectedZone] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Get all Avalon zone names
   const zoneNames = useMemo(() => getAvalonZoneNames(), []);
@@ -24,9 +26,6 @@ export default function Home() {
   const handleZoneSelect = (zone: string) => {
     setSelectedZone(zone);
   };
-
-  const repoUrl = 'https://github.com/psykzz/avalon-hideout-mapper';
-  const newIssueUrl = `${repoUrl}/issues/new?title=New+Hideout+Report&body=**Zone+Name:**%0A%0A**Guild+Name:**%0A%0A**Server:**%0A%0A**Additional+Notes:**%0A`;
 
   return (
     <main className="min-h-screen p-8">
@@ -43,15 +42,19 @@ export default function Home() {
 
         {/* Add Hideout Button */}
         <div className="flex justify-center">
-          <a
-            href={newIssueUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => setIsModalOpen(true)}
             className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-colors"
           >
             ➕ Report New Hideout
-          </a>
+          </button>
         </div>
+
+        {/* Report Hideout Modal */}
+        <ReportHideoutModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
 
         {/* Server Selection */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
