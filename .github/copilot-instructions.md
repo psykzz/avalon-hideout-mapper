@@ -82,7 +82,7 @@ type Server = 'America' | 'Europe' | 'Asia';
 ```typescript
 interface Hideout {
   id: string;                // Unique identifier
-  zoneName: string;          // Must match zone from world.json (all caps)
+  zoneName: string;          // Must match zone from world.json exactly (case-sensitive)
   guildName: string;         // Name of the guild
   server: Server;            // Must be 'America', 'Europe', or 'Asia'
   reportedDate: string;      // ISO 8601 format timestamp
@@ -145,7 +145,7 @@ When validating new hideout reports, use the Albion Online game API to verify gu
 
 ### Important Validation Notes
 - Guild names may contain spaces and special characters
-- Zone names must be in all caps and match the format from world.json (e.g., AVALON-LIONEL-01)
+- Zone names must match exactly with their casing from world.json (e.g., AVALON-LIONEL-01, Quaent-Al-Viesom)
 - Server selection must match where the guild actually plays
 - Use the appropriate API endpoint based on the server specified in the report
 
@@ -185,7 +185,7 @@ When adding new features:
 ## Important Notes
 
 - This project uses the Next.js App Router (not Pages Router)
-- Zone names in hideouts.json must exactly match zone names from world.json
+- Zone names in hideouts.json must exactly match zone names from world.json (case-sensitive)
 - All server values are case-sensitive ('America', 'Europe', 'Asia')
 - The application supports both light and dark color schemes
 - Hideout reports are submitted via GitHub issues using the hideout-report.md template
