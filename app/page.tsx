@@ -29,9 +29,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-12">
         {/* Header */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-6">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
             Avalon Hideout Mapper
           </h1>
@@ -44,7 +44,7 @@ export default function Home() {
         <div className="flex justify-center">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-colors"
+            className="bg-white dark:bg-gray-800 border-2 border-gray-900 dark:border-gray-300 text-gray-900 dark:text-gray-300 font-semibold px-8 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             ➕ Report New Hideout
           </button>
@@ -57,7 +57,7 @@ export default function Home() {
         />
 
         {/* Server Selection */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-gray-800 border-2 border-gray-900 dark:border-gray-300 p-8">
           <ServerSelector 
             selected={selectedServer}
             onChange={setSelectedServer}
@@ -65,7 +65,7 @@ export default function Home() {
         </div>
 
         {/* Zone Search */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-gray-800 border-2 border-gray-900 dark:border-gray-300 p-8">
           <ZoneSearch 
             zones={zoneNames}
             onZoneSelect={handleZoneSelect}
@@ -82,11 +82,11 @@ export default function Home() {
 
         {/* Info Section */}
         {!selectedZone && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">
+          <div className="bg-white dark:bg-gray-800 border-2 border-gray-900 dark:border-gray-300 p-8">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-300 mb-4">
               How to use
             </h3>
-            <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-400">
+            <ul className="list-disc list-inside space-y-2 text-gray-800 dark:text-gray-400">
               <li>Select your server (America, Europe, or Asia)</li>
               <li>Search for an Avalon zone by name</li>
               <li>View guilds that have hideouts in that zone</li>
