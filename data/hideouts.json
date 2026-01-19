@@ -2,30 +2,6 @@
   "hideouts": [
     {
       "id": "1",
-      "zoneName": "AVALON-LIONEL-01",
-      "guildName": "Example Guild Alpha",
-      "server": "America",
-      "reportedDate": "2026-01-15T10:00:00Z",
-      "notes": "Reported by player123"
-    },
-    {
-      "id": "2",
-      "zoneName": "AVALON-LIONEL-01",
-      "guildName": "Example Guild Beta",
-      "server": "America",
-      "reportedDate": "2026-01-16T14:30:00Z",
-      "notes": "Confirmed sighting"
-    },
-    {
-      "id": "3",
-      "zoneName": "AVALON-LIONEL-02",
-      "guildName": "Example Guild Gamma",
-      "server": "Europe",
-      "reportedDate": "2026-01-17T08:15:00Z",
-      "notes": "Multiple hideouts"
-    },
-    {
-      "id": "4",
       "zoneName": "Quaent-Al-Viesom",
       "guildName": "The Lone Black Wolf",
       "server": "Europe",
