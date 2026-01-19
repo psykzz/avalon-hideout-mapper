@@ -23,6 +23,14 @@
       "server": "Europe",
       "reportedDate": "2026-01-17T08:15:00Z",
       "notes": "Multiple hideouts"
+    },
+    {
+      "id": "4",
+      "zoneName": "Quaent-Al-Viesom",
+      "guildName": "The Lone Black Wolf",
+      "server": "Europe",
+      "reportedDate": "2026-01-19T16:50:25Z",
+      "notes": ""
     }
   ]
 }
