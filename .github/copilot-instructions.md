@@ -129,6 +129,26 @@ npm run lint         # Run ESLint
 - Should not be manually edited
 - Update via: `curl -L -o data/world.json https://raw.githubusercontent.com/ao-data/ao-bin-dumps/master/formatted/world.json`
 
+## Validating New Hideout Reports
+
+When validating new hideout reports, use the Albion Online game API to verify guild and zone information:
+
+### API Endpoints by Server
+- **America**: `gameinfo.albiononline.com`
+- **Europe**: `gameinfo-ams.albiononline.com`
+- **Asia**: `gameinfo-sgp.albiononline.com`
+
+### Validation Process
+1. **Verify Guild Exists**: Check if the reported guild name exists on the specified server using the game API
+2. **Verify Zone Name**: Confirm the zone name matches exactly with a zone in `world.json`
+3. **Cross-Reference**: Ensure the guild-zone combination is plausible (guild is active on the server)
+
+### Important Validation Notes
+- Guild names may contain spaces and special characters
+- Zone names must be in all caps and match the format from world.json (e.g., AVALON-LIONEL-01)
+- Server selection must match where the guild actually plays
+- Use the appropriate API endpoint based on the server specified in the report
+
 ## Adding New Features
 
 When adding new features:
