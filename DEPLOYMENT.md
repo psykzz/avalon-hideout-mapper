@@ -34,7 +34,29 @@ vercel
 4. Configure build settings:
    - **Build command**: `npm run build`
    - **Publish directory**: `.next`
-5. Click "Deploy site"
+5. Configure environment variables (see below)
+6. Click "Deploy site"
+
+### Netlify Functions
+
+This application includes serverless functions for automated hideout report submission. To enable this functionality:
+
+1. Go to your Netlify site settings → Environment variables
+2. Add the following environment variable:
+   - **Key**: `GITHUB_TOKEN`
+   - **Value**: Your GitHub personal access token with `repo` scope
+   
+To create a GitHub token:
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click "Generate new token (classic)"
+3. Give it a name (e.g., "Avalon Hideout Mapper - Issue Creation")
+4. Select the `repo` scope
+5. Generate and copy the token
+6. Add it to Netlify environment variables
+
+The function will be available at: `/.netlify/functions/create-hideout-report` or `/api/create-hideout-report`
+
+See `netlify/functions/README.md` for detailed API documentation.
 
 ## Self-Hosted
 
@@ -101,6 +123,8 @@ docker run -p 3000:3000 avalon-hideout-mapper
 
 ## Environment Variables
 
+### Basic Functionality
+
 This application doesn't require any environment variables for basic functionality. If you want to customize the GitHub repository URL, you can set:
 
 ```
@@ -112,6 +136,16 @@ And update `app/page.tsx` to use it:
 ```typescript
 const repoUrl = process.env.NEXT_PUBLIC_REPO_URL || 'https://github.com/psykzz/avalon-hideout-mapper';
 ```
+
+### Netlify Functions (Required for automated issue creation)
+
+If deploying to Netlify and using the automated hideout report submission endpoint:
+
+```
+GITHUB_TOKEN=your_github_personal_access_token
+```
+
+This token should have `repo` scope to create issues in the repository. See the Netlify deployment section above for instructions on creating this token.
 
 ## Static Export (Optional)
 
