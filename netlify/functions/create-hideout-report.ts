@@ -25,15 +25,34 @@ function isValidServer(server: string): server is 'America' | 'Europe' | 'Asia' 
 
 // Extract geo information from the request headers
 function getGeoInfo(event: HandlerEvent): string {
-  const ip = event.headers['x-nf-client-connection-ip'] || 
-             event.headers['x-forwarded-for'] || 
-             'Unknown IP';
+  // Handle x-forwarded-for which may contain multiple IPs from proxies
+  const forwardedFor = event.headers['x-forwarded-for'];
+  const ip = forwardedFor 
+    ? forwardedFor.split(',')[0].trim()
+    : event.headers['x-nf-client-connection-ip'] || 'Unknown IP';
   
   const country = event.headers['x-country'] || 'Unknown';
   const city = event.headers['x-city'] || 'Unknown';
   const region = event.headers['x-subdivision-1-iso-code'] || 'Unknown';
   
   return `IP: ${ip}, Location: ${city}, ${region}, ${country}`;
+}
+
+// Sanitize string for safe inclusion in markdown
+function sanitizeForMarkdown(str: string): string {
+  // Escape markdown special characters to prevent formatting issues
+  return str.replace(/[\\`*_{}[\]()#+\-.!]/g, '\\$&');
+}
+
+// Validate a required string field
+function validateRequiredString(value: any, fieldName: string): { valid: boolean; error?: string } {
+  if (!value || typeof value !== 'string' || value.trim() === '') {
+    return { 
+      valid: false, 
+      error: `${fieldName} is required and must be a non-empty string` 
+    };
+  }
+  return { valid: true };
 }
 
 export const handler: Handler = async (
@@ -82,19 +101,21 @@ export const handler: Handler = async (
   // Validate required fields
   const { zone, guild, server, additional_notes } = requestBody;
 
-  if (!zone || typeof zone !== 'string' || zone.trim() === '') {
+  const zoneValidation = validateRequiredString(zone, 'Zone name');
+  if (!zoneValidation.valid) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Zone name is required and must be a non-empty string' } as ErrorResponse),
+      body: JSON.stringify({ error: zoneValidation.error } as ErrorResponse),
     };
   }
 
-  if (!guild || typeof guild !== 'string' || guild.trim() === '') {
+  const guildValidation = validateRequiredString(guild, 'Guild name');
+  if (!guildValidation.valid) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Guild name is required and must be a non-empty string' } as ErrorResponse),
+      body: JSON.stringify({ error: guildValidation.error } as ErrorResponse),
     };
   }
 
@@ -122,8 +143,9 @@ export const handler: Handler = async (
   });
 
   // Create the issue body
+  const sanitizedGeoInfo = sanitizeForMarkdown(geoInfo);
   const geoInfoLine = includeGeoInIssue 
-    ? `\n---\n\n_This report was submitted via the automated submission endpoint._\n_Requester info: ${geoInfo}_`
+    ? `\n---\n\n_This report was submitted via the automated submission endpoint._\n_Requester info: ${sanitizedGeoInfo}_`
     : '\n---\n\n_This report was submitted via the automated submission endpoint._';
 
   const issueBody = `## Hideout Information
