@@ -10,6 +10,7 @@ interface ZoneSearchProps {
 export default function ZoneSearch({ zones, onZoneSelect }: ZoneSearchProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedZone, setSelectedZone] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   const filteredZones = useMemo(() => {
     if (!searchTerm) return [];
@@ -19,13 +20,19 @@ export default function ZoneSearch({ zones, onZoneSelect }: ZoneSearchProps) {
   }, [searchTerm, zones]);
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    const value = e.target.value;
+    setSearchTerm(value);
+    setIsSearching(value.length > 0);
+    
+    // Simulate search delay for loading state
+    setTimeout(() => setIsSearching(false), 300);
   };
 
   const handleSelectZone = (zone: string) => {
     setSearchTerm(zone);
     setSelectedZone(zone);
     onZoneSelect(zone);
+    setIsSearching(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,8 +44,8 @@ export default function ZoneSearch({ zones, onZoneSelect }: ZoneSearchProps) {
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full">
-      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+    <div className="flex flex-col gap-4 w-full">
+      <label className="text-base font-semibold text-gray-900 dark:text-gray-300">
         Search for Avalon Zone
       </label>
       <form onSubmit={handleSubmit} className="relative">
@@ -47,16 +54,21 @@ export default function ZoneSearch({ zones, onZoneSelect }: ZoneSearchProps) {
           value={searchTerm}
           onChange={handleSearch}
           placeholder="Enter zone name (e.g., AVALON-LIONEL-01)"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          className="w-full px-4 py-3 border-2 border-gray-900 dark:border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-0"
         />
-        {filteredZones.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        {isSearching && (
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <div className="animate-spin h-5 w-5 border-2 border-gray-900 dark:border-gray-300 border-t-transparent rounded-full"></div>
+          </div>
+        )}
+        {filteredZones.length > 0 && !isSearching && (
+          <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 border-2 border-gray-900 dark:border-gray-300 max-h-60 overflow-y-auto">
             {filteredZones.map((zone) => (
               <button
                 key={zone}
                 type="button"
                 onClick={() => handleSelectZone(zone)}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="w-full px-4 py-3 text-left border-b border-gray-300 dark:border-gray-700 last:border-b-0 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-white"
               >
                 {zone}
               </button>
@@ -65,8 +77,8 @@ export default function ZoneSearch({ zones, onZoneSelect }: ZoneSearchProps) {
         )}
       </form>
       {selectedZone && (
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          Selected: <span className="font-semibold">{selectedZone}</span>
+        <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          Selected zone: <span className="font-bold text-gray-900 dark:text-gray-300">{selectedZone}</span>
         </div>
       )}
     </div>
