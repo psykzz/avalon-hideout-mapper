@@ -18,6 +18,9 @@ interface SuccessResponse {
   issueNumber: number;
 }
 
+// Constants
+const DEFAULT_NOTES_TEXT = 'No additional notes provided';
+
 // Validate the server value
 function isValidServer(server: string): server is 'America' | 'Europe' | 'Asia' {
   return server === 'America' || server === 'Europe' || server === 'Asia';
@@ -41,7 +44,9 @@ function getGeoInfo(event: HandlerEvent): string {
 // Sanitize string for safe inclusion in markdown
 function sanitizeForMarkdown(str: string): string {
   // Escape markdown special characters to prevent formatting issues
-  return str.replace(/[\\`*_{}[\]()#+\-.!]/g, '\\$&');
+  // Includes: backslash, backtick, asterisk, underscore, braces, brackets, 
+  // parentheses, hash, plus, hyphen, period, exclamation, tilde (strikethrough)
+  return str.replace(/[\\`*_{}[\]()#+\-.!~]/g, '\\$&');
 }
 
 // Validate a required string field
@@ -146,7 +151,7 @@ export const handler: Handler = async (
   const sanitizedGeoInfo = sanitizeForMarkdown(geoInfo);
   const sanitizedZone = sanitizeForMarkdown(zone);
   const sanitizedGuild = sanitizeForMarkdown(guild);
-  const sanitizedNotes = additional_notes ? sanitizeForMarkdown(additional_notes) : 'No additional notes provided';
+  const sanitizedNotes = additional_notes ? sanitizeForMarkdown(additional_notes) : DEFAULT_NOTES_TEXT;
   
   const geoInfoLine = includeGeoInIssue 
     ? `\n---\n\n_This report was submitted via the automated submission endpoint._\n_Requester info: ${sanitizedGeoInfo}_`
