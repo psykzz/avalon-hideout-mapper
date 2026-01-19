@@ -144,6 +144,10 @@ export const handler: Handler = async (
 
   // Create the issue body
   const sanitizedGeoInfo = sanitizeForMarkdown(geoInfo);
+  const sanitizedZone = sanitizeForMarkdown(zone);
+  const sanitizedGuild = sanitizeForMarkdown(guild);
+  const sanitizedNotes = additional_notes ? sanitizeForMarkdown(additional_notes) : 'No additional notes provided';
+  
   const geoInfoLine = includeGeoInIssue 
     ? `\n---\n\n_This report was submitted via the automated submission endpoint._\n_Requester info: ${sanitizedGeoInfo}_`
     : '\n---\n\n_This report was submitted via the automated submission endpoint._';
@@ -151,10 +155,10 @@ export const handler: Handler = async (
   const issueBody = `## Hideout Information
 
 **Zone Name:**
-${zone}
+${sanitizedZone}
 
 **Guild Name:**
-${guild}
+${sanitizedGuild}
 
 **Server:**
 ${server}
@@ -163,7 +167,7 @@ ${server}
 ${new Date().toISOString().split('T')[0]}
 
 **Additional Notes:**
-${additional_notes || 'No additional notes provided'}
+${sanitizedNotes}
 
 ---
 
