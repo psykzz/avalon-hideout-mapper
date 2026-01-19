@@ -9,6 +9,9 @@ interface ReportHideoutModalProps {
   onClose: () => void;
 }
 
+const MAX_AUTOCOMPLETE_RESULTS = 10;
+const SUCCESS_MESSAGE_DELAY_MS = 2000;
+
 export default function ReportHideoutModal({ isOpen, onClose }: ReportHideoutModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [zones] = useState<string[]>(() => getAvalonZoneNames());
@@ -42,7 +45,7 @@ export default function ReportHideoutModal({ isOpen, onClose }: ReportHideoutMod
     if (value) {
       const filtered = zones.filter(zone => 
         zone.toLowerCase().includes(value.toLowerCase())
-      ).slice(0, 10);
+      ).slice(0, MAX_AUTOCOMPLETE_RESULTS);
       setFilteredZones(filtered);
     } else {
       setFilteredZones([]);
@@ -89,7 +92,7 @@ export default function ReportHideoutModal({ isOpen, onClose }: ReportHideoutMod
           setNotes('');
           setMessage(null);
           onClose();
-        }, 3000);
+        }, SUCCESS_MESSAGE_DELAY_MS);
       } else {
         setMessage({
           type: 'error',
@@ -118,7 +121,11 @@ export default function ReportHideoutModal({ isOpen, onClose }: ReportHideoutMod
     <dialog
       ref={dialogRef}
       onClose={handleClose}
-      className="backdrop:bg-black backdrop:opacity-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-0 max-w-2xl w-full"
+      className="
+        backdrop:bg-black backdrop:opacity-50 
+        bg-white dark:bg-gray-800 
+        rounded-lg shadow-xl p-0 max-w-2xl w-full
+      "
     >
       <div className="p-6">
         {/* Header */}
