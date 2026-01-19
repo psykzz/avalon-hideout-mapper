@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hideout Report API Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Submit Hideout Report</h1>
+        <p>Use this form to submit a hideout report via the API.</p>
+        
+        <form id="reportForm">
+            <label for="zone">Zone Name *</label>
+            <input type="text" id="zone" name="zone" placeholder="e.g., AVALON-LIONEL-01" required>
+            
+            <label for="guild">Guild Name *</label>
+            <input type="text" id="guild" name="guild" placeholder="e.g., Example Guild" required>
+            
+            <label for="server">Server *</label>
+            <select id="server" name="server" required>
+                <option value="">Select a server...</option>
+                <option value="America">America</option>
+                <option value="Europe">Europe</option>
+                <option value="Asia">Asia</option>
+            </select>
+            
+            <label for="notes">Additional Notes</label>
+            <textarea id="notes" name="notes" placeholder="Any additional information (optional)"></textarea>
+            
+            <button type="submit" id="submitBtn">Submit Report</button>
+        </form>
+        
+        <div id="result" class="result hidden"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('reportForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const zone = document.getElementById('zone').value.trim();
+            const guild = document.getElementById('guild').value.trim();
+            const server = document.getElementById('server').value;
+            const notes = document.getElementById('notes').value.trim();
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            // Hide previous result
+            resultDiv.className = 'result hidden';
+            
+            try {
+                // Make API request
+                const response = await fetch('/api/create-hideout-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        zone: zone,
+                        guild: guild,
+                        server: server,
+                        additional_notes: notes || undefined
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Success
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>Success!</strong><br>
+                        Issue created: <a href="${data.issueUrl}" target="_blank">#${data.issueNumber}</a><br>
+                        Your hideout report has been submitted and will be reviewed by the maintainers.
+                    `;
+                    
+                    // Reset form
+                    form.reset();
+                } else {
+                    // Error
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `
+                        <strong>Error:</strong><br>
+                        ${data.error || 'An unknown error occurred'}
+                    `;
+                }
+            } catch (error) {
+                // Network or other error
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <strong>Error:</strong><br>
+                    Failed to submit report. Please check your connection and try again.
+                `;
+                console.error('Error submitting report:', error);
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Report';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -7,8 +7,9 @@ A Next.js application that tracks hideouts across the Avalon roads of Albion Onl
 - 🌍 **Multi-Server Support**: Track hideouts separately for America, Europe, and Asia servers
 - 🔍 **Zone Search**: Search and browse Avalon zones with autocomplete
 - 🏰 **Guild Tracking**: View which guilds have hideouts in specific zones
-- ➕ **Report Hideouts**: Easy reporting via GitHub issues
+- ➕ **Report Hideouts**: Easy reporting via GitHub issues or automated API
 - 📊 **Live Data**: Uses official Albion Online data from ao-bin-dumps
+- 🤖 **Automated Submission**: Netlify function for programmatic hideout reporting (no GitHub account required)
 
 ## Getting Started
 
@@ -58,11 +59,32 @@ npm run start
 
 ## Contributing
 
+### Reporting Hideouts
+
 To add a new hideout report:
 
-1. Click the "Report New Hideout" button on the website
-2. Fill out the GitHub issue template with zone name, guild name, server, and any additional notes
-3. A maintainer will review and add it to the data
+1. **Via GitHub Issues** (requires GitHub account):
+   - Click the "Report New Hideout" button on the website
+   - Fill out the GitHub issue template with zone name, guild name, server, and any additional notes
+   - A maintainer will review and add it to the data
+
+2. **Via API** (no GitHub account required, Netlify deployment only):
+   - Send a POST request to `/api/create-hideout-report` with the hideout information
+   - See `netlify/functions/README.md` for API documentation
+   - The function will automatically create a GitHub issue for review
+
+### API Example
+
+```bash
+curl -X POST https://your-site.netlify.app/api/create-hideout-report \
+  -H "Content-Type: application/json" \
+  -d '{
+    "zone": "AVALON-LIONEL-01",
+    "guild": "Example Guild",
+    "server": "America",
+    "additional_notes": "Optional notes"
+  }'
+```
 
 ## Tech Stack
 
