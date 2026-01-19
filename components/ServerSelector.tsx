@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useMemo } from 'react';
 import { Server } from '@/lib/types';
 
 interface ServerSelectorProps {
