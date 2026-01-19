@@ -18,8 +18,25 @@ interface SuccessResponse {
   issueNumber: number;
 }
 
+interface AlbionSearchResponse {
+  guilds: Array<{
+    Id: string;
+    Name: string;
+    AllianceId: string;
+    AllianceName: string;
+  }>;
+  players: Array<unknown>;
+}
+
 // Constants
 const DEFAULT_NOTES_TEXT = 'No additional notes provided';
+
+// API endpoints for each server
+const SERVER_API_ENDPOINTS = {
+  America: 'https://gameinfo.albiononline.com',
+  Europe: 'https://gameinfo-ams.albiononline.com',
+  Asia: 'https://gameinfo-sgp.albiononline.com',
+} as const;
 
 // Validate the server value
 function isValidServer(server: string): server is 'America' | 'Europe' | 'Asia' {
@@ -58,6 +75,69 @@ function validateRequiredString(value: any, fieldName: string): { valid: boolean
     };
   }
   return { valid: true };
+}
+
+// Validate zone name against world.json
+async function validateZone(zoneName: string): Promise<{ valid: boolean; error?: string }> {
+  try {
+    // Import world.json dynamically
+    const worldData = await import('../../data/world.json');
+    const zones = worldData.default || worldData;
+    
+    // Check if the zone exists in the world data
+    const zoneExists = zones.some((zone: { Index: string; UniqueName: string }) => 
+      zone.UniqueName === zoneName || zone.Index === zoneName
+    );
+    
+    if (!zoneExists) {
+      return {
+        valid: false,
+        error: `Zone "${zoneName}" not found. Please check the zone name and try again.`
+      };
+    }
+    
+    return { valid: true };
+  } catch (error) {
+    console.error('[HIDEOUT REPORT] Error loading zone data:', error);
+    // If we can't load the data, allow the submission but log the error
+    return { valid: true };
+  }
+}
+
+// Validate guild name via Albion Online API
+async function validateGuild(guildName: string, server: 'America' | 'Europe' | 'Asia'): Promise<{ valid: boolean; error?: string }> {
+  try {
+    const apiEndpoint = SERVER_API_ENDPOINTS[server];
+    const searchUrl = `${apiEndpoint}/api/gameinfo/search?q=${encodeURIComponent(guildName)}`;
+    
+    const response = await fetch(searchUrl);
+    
+    if (!response.ok) {
+      console.error(`[HIDEOUT REPORT] API request failed: ${response.status}`);
+      // If API is down, allow the submission but log the error
+      return { valid: true };
+    }
+    
+    const data = await response.json() as AlbionSearchResponse;
+    
+    // Check if guild exists with exact name match (case-insensitive)
+    const guildExists = data.guilds.some(guild => 
+      guild.Name.toLowerCase() === guildName.toLowerCase()
+    );
+    
+    if (!guildExists) {
+      return {
+        valid: false,
+        error: `Guild "${guildName}" not found on ${server} server. Please check the guild name and server selection.`
+      };
+    }
+    
+    return { valid: true };
+  } catch (error) {
+    console.error('[HIDEOUT REPORT] Error validating guild:', error);
+    // If validation fails due to network error, allow the submission
+    return { valid: true };
+  }
 }
 
 export const handler: Handler = async (
@@ -129,6 +209,26 @@ export const handler: Handler = async (
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: 'Server must be one of: America, Europe, Asia' } as ErrorResponse),
+    };
+  }
+
+  // Validate zone exists in world.json
+  const zoneCheck = await validateZone(zone);
+  if (!zoneCheck.valid) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: zoneCheck.error } as ErrorResponse),
+    };
+  }
+
+  // Validate guild exists on the specified server
+  const guildCheck = await validateGuild(guild, server);
+  if (!guildCheck.valid) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: guildCheck.error } as ErrorResponse),
     };
   }
 

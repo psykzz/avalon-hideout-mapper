@@ -45,12 +45,25 @@ The function expects a JSON request body with the following fields:
 ```
 
 **Required fields:**
-- `zone` (string): The Avalon zone name
-- `guild` (string): The guild name
+- `zone` (string): The Avalon zone name. Must exist in the world.json data.
+- `guild` (string): The guild name. Must exist on the specified server (validated via Albion Online API).
 - `server` (string): Must be one of: "America", "Europe", or "Asia"
 
 **Optional fields:**
 - `additional_notes` (string): Any additional information about the hideout
+
+### Validation
+
+The function performs the following validations before creating an issue:
+
+1. **Zone Validation**: Verifies the zone name exists in the Avalon zone data (world.json)
+2. **Guild Validation**: Verifies the guild exists on the specified server using the Albion Online game API
+   - America server: `gameinfo.albiononline.com`
+   - Europe server: `gameinfo-ams.albiononline.com`
+   - Asia server: `gameinfo-sgp.albiononline.com`
+3. **Server Validation**: Ensures the server is one of the three valid options
+
+If validation fails, the function returns a 400 Bad Request with a descriptive error message.
 
 ### Response
 
@@ -69,6 +82,11 @@ The function expects a JSON request body with the following fields:
   "error": "Error message describing what went wrong"
 }
 ```
+
+**Example error messages:**
+- `Zone "INVALID-ZONE" not found. Please check the zone name and try again.`
+- `Guild "NonExistentGuild" not found on America server. Please check the guild name and server selection.`
+- `Server must be one of: America, Europe, Asia`
 
 ### Error Codes
 
